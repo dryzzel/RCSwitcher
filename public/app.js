@@ -577,6 +577,27 @@ function showSuccessResult(result) {
 }
 
 function showErrorResult(message) {
+  // Detect specific RingCentral error codes for user-friendly messages
+  const isRcApiError = message && (message.includes('CMN-203') || message.includes('CMN-201'));
+
+  let errorTitle = 'Switch Failed';
+  let errorBody = '';
+
+  if (isRcApiError) {
+    errorTitle = 'RingCentral API Error';
+    errorBody = 'The RingCentral API is currently failing. Please contact an administrator for your number change.';
+  } else {
+    // Extract the error code/name if present (e.g., "CMN-xxx" or other identifiers)
+    const codeMatch = message && message.match(/\b(CMN-\d+|[A-Z]{2,5}-\d{3,})\b/);
+    const errorName = codeMatch ? codeMatch[1] : null;
+
+    if (errorName) {
+      errorBody = `An error has occurred (${errorName}). Please contact an administrator for your number change.`;
+    } else {
+      errorBody = 'An error has occurred. Please contact an administrator for your number change.';
+    }
+  }
+
   resultContent.innerHTML = `
     <div class="result-error">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="result-icon">
@@ -585,8 +606,8 @@ function showErrorResult(message) {
         <line x1="9" y1="9" x2="15" y2="15"></line>
       </svg>
       <div class="result-text">
-        <h4>Switch Failed</h4>
-        <p>${escapeHtml(message)}</p>
+        <h4>${errorTitle}</h4>
+        <p>${escapeHtml(errorBody)}</p>
       </div>
     </div>
   `;
