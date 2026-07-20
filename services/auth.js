@@ -55,6 +55,8 @@ function getLoginUrl() {
   const url = platform.loginUrl({ state });
 
   console.log('[Auth] 🔗 Login URL generated');
+  console.log('[Auth] 🔍 DEBUG redirect_uri from env:', process.env.RC_REDIRECT_URI);
+  console.log('[Auth] 🔍 DEBUG full login URL:', url);
   return { url, state };
 }
 
@@ -93,6 +95,7 @@ async function handleCallback(code) {
 
       // Step 1: Exchange code for access token
       console.log(`[Auth] 🔄 Exchanging authorization code for token (attempt ${attempt}/${MAX_RETRIES})...`);
+      console.log('[Auth] 🔍 DEBUG token exchange redirect_uri:', process.env.RC_REDIRECT_URI);
       await platform.login({ code, redirect_uri: process.env.RC_REDIRECT_URI });
       console.log('[Auth] ✅ Agent token obtained');
 
